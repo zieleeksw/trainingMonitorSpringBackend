@@ -21,9 +21,11 @@ import java.util.Objects;
 public class UserServiceImpl implements UserService {
     @Autowired
     UserDao userDao;
+
+
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
-        log.info("inside signup {}" , requestMap);
+        log.info("inside signup {}", requestMap);
         try {
             if (validateSignUpMap(requestMap)) {
                 User user = userDao.findByEmail(requestMap.get("email"));
@@ -36,20 +38,17 @@ public class UserServiceImpl implements UserService {
             } else {
                 return AppUtils.getResponseEntity(AppConstants.INVALID_DATA, HttpStatus.BAD_REQUEST);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private boolean validateSignUpMap(Map<String, String> requestMap){
-        return requestMap.containsKey("username") && requestMap.containsKey("name")
-                && requestMap.containsKey("email") && requestMap.containsKey("password")
-                && requestMap.containsKey("dob") && requestMap.containsKey("gender")
-                && requestMap.containsKey("height") && requestMap.containsKey("currentWeight")
-                && requestMap.containsKey("targetWeight") && requestMap.containsKey("weightPerWeek");
+    private boolean validateSignUpMap(Map<String, String> requestMap) {
+        return requestMap.containsKey("username") && requestMap.containsKey("name") && requestMap.containsKey("email") && requestMap.containsKey("password") && requestMap.containsKey("dob") && requestMap.containsKey("gender") && requestMap.containsKey("height") && requestMap.containsKey("currentWeight") && requestMap.containsKey("targetWeight") && requestMap.containsKey("weightPerWeek");
     }
-    private User getUserFromMap(Map<String, String> requestMap){
+
+    private User getUserFromMap(Map<String, String> requestMap) {
         User user = new User();
         user.setName(requestMap.get("name"));
         user.setUsername(requestMap.get("username"));
@@ -70,4 +69,5 @@ public class UserServiceImpl implements UserService {
     public List<User> getUsers() {
         return userDao.findAll();
     }
+
 }

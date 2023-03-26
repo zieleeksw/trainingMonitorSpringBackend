@@ -21,14 +21,13 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
-        try{
+        try {
             return userService.signUp(requestMap);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-       return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
     @Override
     public List<User> getUsers() {
         return userService.getUsers();
