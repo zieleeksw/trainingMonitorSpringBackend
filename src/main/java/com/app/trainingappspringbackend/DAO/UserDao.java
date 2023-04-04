@@ -1,12 +1,13 @@
 package com.app.trainingappspringbackend.DAO;
 
-import com.app.trainingappspringbackend.POJO.User;
+import com.app.trainingappspringbackend.POJO.UserApp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface UserDao extends JpaRepository<User, Long> {
+import java.util.Optional;
 
-    User findByEmail(@Param("email") String email);
+@Repository
+public interface UserDao extends JpaRepository<UserApp, Long> {
+    Optional<UserApp> findByEmail(String email);
 }

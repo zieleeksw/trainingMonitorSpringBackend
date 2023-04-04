@@ -2,34 +2,44 @@ package com.app.trainingappspringbackend.serviceImpl;
 
 import com.app.trainingappspringbackend.DAO.UserDao;
 import com.app.trainingappspringbackend.POJO.Role;
-import com.app.trainingappspringbackend.POJO.User;
+import com.app.trainingappspringbackend.POJO.UserApp;
 import com.app.trainingappspringbackend.constants.AppConstants;
+import com.app.trainingappspringbackend.security.JwtService;
 import com.app.trainingappspringbackend.service.UserService;
 import com.app.trainingappspringbackend.utils.AppUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
-    UserDao userDao;
+    private final UserDao userDao;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
+    private final JwtService jwtService;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
         log.info("inside signup {}", requestMap);
         try {
             if (validateSignUpMap(requestMap)) {
-                User user = userDao.findByEmail(requestMap.get("email"));
-                if (Objects.isNull(user)) {
+                Optional<UserApp> user = userDao.findByEmail(requestMap.get("email"));
+                System.out.println(requestMap.get("password"));
+                if (!user.isPresent()) {
                     userDao.save(getUserFromMap(requestMap));
                     return AppUtils.getResponseEntity(AppConstants.SUCCESSFULLY_REGISTERED, HttpStatus.OK);
                 } else {
@@ -45,28 +55,51 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean validateSignUpMap(Map<String, String> requestMap) {
-        return requestMap.containsKey("username") && requestMap.containsKey("name") && requestMap.containsKey("email") && requestMap.containsKey("password") && requestMap.containsKey("dob") && requestMap.containsKey("gender") && requestMap.containsKey("height") && requestMap.containsKey("currentWeight") && requestMap.containsKey("targetWeight") && requestMap.containsKey("weightPerWeek");
+        return  requestMap.containsKey("name") &&
+                requestMap.containsKey("email") &&
+                requestMap.containsKey("password") &&
+                requestMap.containsKey("dob") &&
+                requestMap.containsKey("gender") &&
+                requestMap.containsKey("height") &&
+                requestMap.containsKey("currentWeight") &&
+                requestMap.containsKey("targetWeight") &&
+                requestMap.containsKey("weightPerWeek");
     }
 
-    private User getUserFromMap(Map<String, String> requestMap) {
-        User user = new User();
-        user.setName(requestMap.get("name"));
-        user.setUsername(requestMap.get("username"));
-        user.setEmail(requestMap.get("email"));
-        user.setPassword(requestMap.get("password"));
-        user.setDob(LocalDate.parse(requestMap.get("dob")));
-        user.setGender(requestMap.get("gender"));
-        user.setRole(Role.USER);
-        user.setHeight(Integer.parseInt(requestMap.get("height")));
-        user.setCurrentWeight(Double.parseDouble(requestMap.get("currentWeight")));
-        user.setTargetWeight(Double.parseDouble(requestMap.get("targetWeight")));
-        user.setWeightPerWeek(Double.parseDouble(requestMap.get("weightPerWeek")));
-        user.setActivityLevel(requestMap.get("activityLevel"));
-        return user;
+    private UserApp getUserFromMap(Map<String, String> requestMap) {
+        UserApp userApp = UserApp.builder()
+                .name(requestMap.get("name"))
+                .email(requestMap.get("email"))
+                .password(passwordEncoder.encode(requestMap.get("password")))
+                .dob(LocalDate.parse(requestMap.get("dob")))
+                .gender(requestMap.get("gender"))
+                .role(Role.USER)
+                .height(Integer.parseInt(requestMap.get("height")))
+                .currentWeight(Double.parseDouble(requestMap.get("currentWeight")))
+                .targetWeight(Double.parseDouble(requestMap.get("targetWeight")))
+                .weightPerWeek(Double.parseDouble(requestMap.get("weightPerWeek")))
+                .activityLevel(requestMap.get("activityLevel"))
+                .build();
+        return userApp;
     }
 
     @Override
-    public List<User> getUsers() {
+    public ResponseEntity<String> login(Map<String, String> requestMap) {
+        log.info("Inside login " + requestMap);
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password"))
+            );
+            var user = userDao.findByEmail(requestMap.get("email")).orElseThrow();
+            var jwtToken = jwtService.generateToken(user);
+            return new ResponseEntity<>("{\"token\":\"" + jwtToken + "\"}", HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return AppUtils.getResponseEntity(AppConstants.LOGIN_OR_PASSWORD_INVALID, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    @Override
+    public List<UserApp> getUsers() {
         return userDao.findAll();
     }
 

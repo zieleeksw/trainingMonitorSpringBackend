@@ -1,5 +1,5 @@
 package com.app.trainingappspringbackend.controllers;
-import com.app.trainingappspringbackend.POJO.User;
+import com.app.trainingappspringbackend.POJO.UserApp;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,8 +13,9 @@ import java.util.Map;
 public interface UserController {
     @PostMapping(path = "/signup")
     ResponseEntity<String> signUp(@RequestBody Map<String, String> requestMap);
-
+    @PostMapping(path = "/login")
+    ResponseEntity<String> login(@RequestBody Map<String, String> requestMap);
     @GetMapping()
-    public List<User> getUsers();
+    public List<UserApp> getUsers();
 
 }

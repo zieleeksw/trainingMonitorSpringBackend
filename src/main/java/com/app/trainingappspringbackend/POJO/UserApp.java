@@ -3,23 +3,28 @@ package com.app.trainingappspringbackend.POJO;
 import com.app.trainingappspringbackend.utils.Calculator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "_user")
-public class User implements Serializable {
+@Builder
+public class UserApp implements Serializable, UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String username;
     private String name;
     private String email;
     private String password;
@@ -41,26 +46,59 @@ public class User implements Serializable {
     @Transient
     private LocalDate dietFinish;
 
-    public int getAge(){
+    public int getAge() {
         return Period.between(this.dob, LocalDate.now()).getYears();
     }
-    public int getCaloricNeeds(){
+
+    public int getCaloricNeeds() {
         double bmr =
                 Calculator.getBmrByGender(gender, height, currentWeight, age);
         double caloricNeeds =
                 Calculator.getBmrWithActivityLevel(activityLevel, bmr);
-        return (int)  Calculator.getBmrWithDietStatus(caloricNeeds,
-                                getDietStatus(), weightPerWeek);
+        return (int) Calculator.getBmrWithDietStatus(caloricNeeds,
+                getDietStatus(), weightPerWeek);
     }
-    public String getDietStatus(){
+
+    public String getDietStatus() {
         return Calculator.calculateDietStatus(currentWeight, targetWeight);
     }
 
     public LocalDate getDietFinish() {
         return Calculator.getDietFinishDate(currentWeight, targetWeight, weightPerWeek);
     }
+
     public void setWeightPerWeek(double weightPerWeek) {
-        if( currentWeight == targetWeight ) weightPerWeek = 0.0d;
+        if (currentWeight == targetWeight) weightPerWeek = 0.0d;
         this.weightPerWeek = weightPerWeek;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

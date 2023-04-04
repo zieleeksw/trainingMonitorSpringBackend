@@ -5,4 +5,5 @@ public class AppConstants {
     public static final String INVALID_DATA = "Invalid data";
     public static final String EMAIL_ALREADY_EXISTS = "Email already exists";
     public static final String SUCCESSFULLY_REGISTERED = "Successfully registered new account";
+    public static final String LOGIN_OR_PASSWORD_INVALID = "Login or password are invalid";
 }

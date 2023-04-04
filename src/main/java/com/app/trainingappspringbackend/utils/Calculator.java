@@ -3,9 +3,7 @@ package com.app.trainingappspringbackend.utils;
 import java.time.LocalDate;
 
 public class Calculator {
-
     private Calculator() {
-
     }
 
     // BMR formula for men: 66 + (6.2 x weight in pounds) + (12.7 x height in inches) - (6.76 x age in years)
@@ -20,7 +18,6 @@ public class Calculator {
         } else if (gender.equals("Female")) {
             bmr = 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
         }
-        System.out.println(bmr);
         return bmr;
     }
 
@@ -33,7 +30,6 @@ public class Calculator {
             case "Very hard active" -> bmr * 1.9;
             default -> 0.0d;
         };
-        System.out.println("with activity level :) " + bmr);
         return bmr;
     }
 
@@ -45,7 +41,6 @@ public class Calculator {
         } else if (dietStatus.equals("Reduction")) {
             caloricNeeds = caloricNeeds - 7700 * weightPerWeek / 7;
         }
-
         return caloricNeeds;
     }
 
@@ -72,5 +67,4 @@ public class Calculator {
         } while (result < weight);
         return LocalDate.now().plusWeeks(count);
     }
-
 }
