@@ -25,7 +25,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private String userEmail = null;
     Claims claims = null;
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -61,11 +60,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     public boolean isAdmin() {
-        return "admin".equalsIgnoreCase((String) claims.get("role"));
+        return "[admin]".equalsIgnoreCase((String) claims.get("role"));
     }
 
     public boolean isUser() {
-        return "user".equalsIgnoreCase((String) claims.get("role"));
+        return "[user]".equalsIgnoreCase((String) claims.get("role"));
     }
 
     public String getCurrentUserEmail() {

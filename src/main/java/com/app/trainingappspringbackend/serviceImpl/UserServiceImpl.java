@@ -4,6 +4,7 @@ import com.app.trainingappspringbackend.DAO.UserDao;
 import com.app.trainingappspringbackend.POJO.Role;
 import com.app.trainingappspringbackend.POJO.UserApp;
 import com.app.trainingappspringbackend.constants.AppConstants;
+import com.app.trainingappspringbackend.security.JwtAuthenticationFilter;
 import com.app.trainingappspringbackend.security.JwtService;
 import com.app.trainingappspringbackend.service.UserService;
 import com.app.trainingappspringbackend.utils.AppUtils;
@@ -16,8 +17,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
 
     private final JwtService jwtService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
@@ -38,7 +40,6 @@ public class UserServiceImpl implements UserService {
         try {
             if (validateSignUpMap(requestMap)) {
                 Optional<UserApp> user = userDao.findByEmail(requestMap.get("email"));
-                System.out.println(requestMap.get("password"));
                 if (!user.isPresent()) {
                     userDao.save(getUserFromMap(requestMap));
                     return AppUtils.getResponseEntity(AppConstants.SUCCESSFULLY_REGISTERED, HttpStatus.OK);
@@ -98,9 +99,33 @@ public class UserServiceImpl implements UserService {
         }
         return AppUtils.getResponseEntity(AppConstants.LOGIN_OR_PASSWORD_INVALID, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @Override
-    public List<UserApp> getUsers() {
-        return userDao.findAll();
+    public ResponseEntity<Optional<UserApp>> fetchUserById(Long id) {
+        try {
+            Optional optional = userDao.findById(id);
+                if (optional.isEmpty()){
+                    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                else {
+                    return new ResponseEntity<>(optional, HttpStatus.OK);
+                }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<List<UserApp>> getUsers() {
+        try{
+            if (jwtAuthenticationFilter.isUser() || jwtAuthenticationFilter.isAdmin()){
+                return new ResponseEntity<>(userDao.findAll(), HttpStatus.OK);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

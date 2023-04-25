@@ -1,13 +1,11 @@
 package com.app.trainingappspringbackend.controllers;
 import com.app.trainingappspringbackend.POJO.UserApp;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequestMapping(path = "/user")
 public interface UserController {
@@ -16,5 +14,8 @@ public interface UserController {
     @PostMapping(path = "/login")
     ResponseEntity<String> login(@RequestBody Map<String, String> requestMap);
     @GetMapping()
-    List<UserApp> getUsers();
+    ResponseEntity<List<UserApp>> getUsers();
+    @GetMapping("/{id}")
+    ResponseEntity<Optional<UserApp>> fetchUserById(@PathVariable("id") Long id);
+
 }
