@@ -16,6 +16,5 @@ public interface UserController {
     @PostMapping(path = "/login")
     ResponseEntity<String> login(@RequestBody Map<String, String> requestMap);
     @GetMapping()
-    public List<UserApp> getUsers();
-
+    List<UserApp> getUsers();
 }
