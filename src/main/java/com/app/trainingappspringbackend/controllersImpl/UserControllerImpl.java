@@ -58,4 +58,13 @@ public class UserControllerImpl implements UserController {
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @Override
+    public ResponseEntity<String> deleteUserById(Long id) {
+        try{
+            userService.deleteUserById(id);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return AppUtils.getResponseEntity("CHIJ", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

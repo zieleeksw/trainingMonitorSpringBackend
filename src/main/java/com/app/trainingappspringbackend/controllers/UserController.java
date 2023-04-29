@@ -1,5 +1,6 @@
 package com.app.trainingappspringbackend.controllers;
 import com.app.trainingappspringbackend.POJO.UserApp;
+import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,5 +18,6 @@ public interface UserController {
     ResponseEntity<List<UserApp>> getUsers();
     @GetMapping("/{id}")
     ResponseEntity<Optional<UserApp>> fetchUserById(@PathVariable("id") Long id);
-
+    @DeleteMapping("/{id}")
+    ResponseEntity<String> deleteUserById(@PathVariable("id") Long id);
 }

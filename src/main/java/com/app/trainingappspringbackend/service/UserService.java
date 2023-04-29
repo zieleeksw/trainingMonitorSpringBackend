@@ -11,5 +11,7 @@ public interface UserService {
     ResponseEntity<List<UserApp>> getUsers();
     ResponseEntity<String> login(Map<String, String> requestMap);
 
-    public ResponseEntity<Optional<UserApp>> fetchUserById(Long id);
+    ResponseEntity<Optional<UserApp>> fetchUserById(Long id);
+
+    ResponseEntity<String> deleteUserById(Long id);
 }
