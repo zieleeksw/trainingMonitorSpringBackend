@@ -129,7 +129,27 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.BAD_REQUEST);
+        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
+        try {
+            Optional<UserApp> optional = userDao.findByEmail(jwtAuthenticationFilter.getCurrentUserEmail());
+            if (optional.isPresent()) {
+                UserApp user = optional.get();
+                if (passwordEncoder.matches(requestMap.get("oldPassword"), user.getPassword())) {
+                    user.setPassword(passwordEncoder.encode(requestMap.get("newPassword")));
+                    userDao.save(user);
+                    return AppUtils.getResponseEntity("Password changed successfully", HttpStatus.OK);
+                } else
+                    return AppUtils.getResponseEntity("Incorrect old password", HttpStatus.BAD_REQUEST);
+            }
+            return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override

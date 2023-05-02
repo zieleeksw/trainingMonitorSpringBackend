@@ -24,4 +24,7 @@ public interface UserController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteUserById(@PathVariable("id") Long id);
+
+    @PostMapping("/changePassword")
+    ResponseEntity<String> changePassword(@RequestBody Map<String, String> requestMap);
 }

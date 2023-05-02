@@ -20,4 +20,6 @@ public interface UserService {
 
     //boolean deleteUserById(Long id);
     ResponseEntity<String> deleteUserById(Long id);
+
+    ResponseEntity<String> changePassword(Map<String, String> requestMap);
 }
