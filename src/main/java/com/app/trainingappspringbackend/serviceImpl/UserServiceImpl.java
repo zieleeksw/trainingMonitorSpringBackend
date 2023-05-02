@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,7 @@ public class UserServiceImpl implements UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
     @Override
     public ResponseEntity<String> signUp(Map<String, String> requestMap) {
         log.info("inside signup {}", requestMap);
@@ -52,8 +54,9 @@ public class UserServiceImpl implements UserService {
         }
         return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     private boolean validateSignUpMap(Map<String, String> requestMap) {
-        return  requestMap.containsKey("name") &&
+        return requestMap.containsKey("name") &&
                 requestMap.containsKey("email") &&
                 requestMap.containsKey("password") &&
                 requestMap.containsKey("dob") &&
@@ -80,6 +83,7 @@ public class UserServiceImpl implements UserService {
                 .build();
         return userApp;
     }
+
     @Override
     public ResponseEntity<String> login(Map<String, String> requestMap) {
         log.info("Inside login " + requestMap);
@@ -95,17 +99,17 @@ public class UserServiceImpl implements UserService {
         }
         return AppUtils.getResponseEntity(AppConstants.LOGIN_OR_PASSWORD_INVALID, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @Override
     public ResponseEntity<Optional<UserApp>> fetchUserById(Long id) {
         try {
             Optional<UserApp> optional = userDao.findById(id);
-                if (optional.isEmpty()){
-                    return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-                else {
-                    return new ResponseEntity<>(optional, HttpStatus.OK);
-                }
-        }catch (Exception e){
+            if (optional.isEmpty()) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                return new ResponseEntity<>(optional, HttpStatus.OK);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -114,29 +118,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<String> deleteUserById(Long id) {
         try {
-            if(jwtAuthenticationFilter.isAdmin()){
-                Optional<UserApp> optional = userDao.findById(id);
-                if(optional.isPresent()){
+            if (jwtAuthenticationFilter.isAdmin()) {
+                if (userDao.existsById(id)) {
                     userDao.deleteById(id);
-                        return  AppUtils.getResponseEntity("User with id: " + id + " deleted successfully", HttpStatus.OK);
-                }else{
+                    return AppUtils.getResponseEntity("User with id: " + id + " deleted successfully", HttpStatus.OK);
+                } else
                     return AppUtils.getResponseEntity(AppConstants.INVALID_ID, HttpStatus.NOT_FOUND);
-                }
-            } else {
-                 return AppUtils.getResponseEntity(AppConstants.NO_PRIVILEGES, HttpStatus.FORBIDDEN);
-            }
-        }catch (Exception e){
+            } else
+                return AppUtils.getResponseEntity(AppConstants.NO_PERMISSION, HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG,HttpStatus.INTERNAL_SERVER_ERROR);
+        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.BAD_REQUEST);
     }
+
     @Override
     public ResponseEntity<List<UserApp>> getUsers() {
-        try{
-            if (jwtAuthenticationFilter.isUser() || jwtAuthenticationFilter.isAdmin()){
+        try {
+            if (jwtAuthenticationFilter.isUser() || jwtAuthenticationFilter.isAdmin()) {
                 return new ResponseEntity<>(userDao.findAll(), HttpStatus.OK);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);

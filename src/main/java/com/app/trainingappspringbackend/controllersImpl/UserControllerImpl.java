@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +29,12 @@ public class UserControllerImpl implements UserController {
         }
         return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
     @Override
     public ResponseEntity<String> login(Map<String, String> requestMap) {
-        try{
+        try {
             return userService.login(requestMap);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -40,19 +42,19 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<List<UserApp>> getUsers() {
-        try{
+        try {
             return userService.getUsers();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
     public ResponseEntity<Optional<UserApp>> fetchUserById(Long id) {
         try {
             return userService.fetchUserById(id);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -60,11 +62,11 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<String> deleteUserById(Long id) {
-        try{
-            userService.deleteUserById(id);
-        } catch (Exception e){
+        try {
+            return userService.deleteUserById(id);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return AppUtils.getResponseEntity("CHIJ", HttpStatus.INTERNAL_SERVER_ERROR);
+        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
