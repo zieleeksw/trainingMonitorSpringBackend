@@ -33,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (request.getServletPath().matches("/user/login|/user/signup|/user/forgotPassword")) {
+        if (request.getServletPath().matches("/login|/signup|/forgotPassword")) {
             filterChain.doFilter(request, response);
         } else {
             String authHeader = request.getHeader("Authorization");

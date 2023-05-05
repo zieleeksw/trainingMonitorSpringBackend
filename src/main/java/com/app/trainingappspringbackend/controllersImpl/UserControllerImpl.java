@@ -12,33 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 public class UserControllerImpl implements UserController {
     private final UserService userService;
-
-    @Override
-    public ResponseEntity<String> signUp(Map<String, String> requestMap) {
-        try {
-            return userService.signUp(requestMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Override
-    public ResponseEntity<String> login(Map<String, String> requestMap) {
-        try {
-            return userService.login(requestMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
     @Override
     public ResponseEntity<List<UserApp>> getUsers() {
@@ -70,13 +49,4 @@ public class UserControllerImpl implements UserController {
         return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @Override
-    public ResponseEntity<String> changePassword(Map<String, String> requestMap) {
-        try {
-            return userService.changePassword(requestMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return AppUtils.getResponseEntity(AppConstants.SOMETHING_WENT_WRONG, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

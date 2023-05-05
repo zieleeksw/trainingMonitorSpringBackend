@@ -2,20 +2,16 @@ package com.app.trainingappspringbackend.controllers;
 
 import com.app.trainingappspringbackend.POJO.UserApp;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RequestMapping(path = "/user")
 public interface UserController {
-    @PostMapping(path = "/signup")
-    ResponseEntity<String> signUp(@RequestBody Map<String, String> requestMap);
-
-    @PostMapping(path = "/login")
-    ResponseEntity<String> login(@RequestBody Map<String, String> requestMap);
-
     @GetMapping()
     ResponseEntity<List<UserApp>> getUsers();
 
@@ -24,7 +20,4 @@ public interface UserController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteUserById(@PathVariable("id") Long id);
-
-    @PostMapping("/changePassword")
-    ResponseEntity<String> changePassword(@RequestBody Map<String, String> requestMap);
 }
